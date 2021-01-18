@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.android11_demo">
+    <!--
+         Grants the READ_PHONE_STATE permission only on devices that run
+        Android 10 (API level 29) and lower.
+    -->
+    <uses-permission
+        android:name="android.permission.READ_PHONE_STATE"
+        android:maxSdkVersion="29" />
+    <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Android11_demo">
+        <activity android:name=".KeyboardIMEActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeGroup="myMimeGroup"/>
+            </intent-filter>
+        </activity>
+        <activity android:name=".AuditAccessToDataActivity" />
+        <activity android:name=".CallScreeningActivity" />
+        <activity android:name=".ScopedStorageActivity" />
+        <activity android:name=".ImageDecoderActivity" />
+        <activity android:name=".AppExitReasonActivity" />
+
+        <service
+            android:name=".service.CallService"
+            android:permission="android.permission.BIND_SCREENING_SERVICE">
+            <intent-filter>
+                <action android:name="android.telecom.CallScreeningService" />
+            </intent-filter>
+        </service>
+
+        <activity
+            android:name=".BioActivity"
+            android:theme="@style/AppTheme.Fullscreen">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".MainActivity" />
+        <activity
+            android:name=".BubbleActivity"
+            android:allowEmbedded="true"
+            android:documentLaunchMode="always"
+            android:label="title_activity_bubble"
+            android:resizeableActivity="true"
+            android:theme="@style/AppTheme.NoActionBar" />
+    </application>
+
+</manifest>
