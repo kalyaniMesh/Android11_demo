@@ -54,13 +54,13 @@ public class BioActivity extends AppCompatActivity {
         setContentView(R.layout.activity_bio);
         ButterKnife.bind(this);
         mContext=this;
-        //funAppExitReason();
-        funBiometric();
-      /*  try {
+        funAppExitReason();
+         funBiometric();
+        try {
             funResourcesProviderAndLoader();
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
+        }
     }
 
     private void funDisplayCutout(){
@@ -72,7 +72,7 @@ public class BioActivity extends AppCompatActivity {
 
             /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             DisplayCutout displayCutout = getWindow().getDecorView().getRootWindowInsets().getDisplayCutout();
-}*/
+            }*/
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
@@ -92,8 +92,6 @@ public class BioActivity extends AppCompatActivity {
             mIvTest.setVisibility(View.VISIBLE);
             mIvTest.setImageBitmap(bitmap1);
         }
-
-
     }
 
     private void funBiometric(){
@@ -184,6 +182,10 @@ public class BioActivity extends AppCompatActivity {
 
             case R.id.btnAuditAccessData:
                 startActivity(new Intent(BioActivity.this, AuditAccessToDataActivity.class));
+                break;
+
+            case R.id.btnPowerManager:
+                startActivity(new Intent(BioActivity.this, PowerManagerActivity.class));
                 break;
 
         }

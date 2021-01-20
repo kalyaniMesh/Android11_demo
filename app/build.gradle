@@ -56,7 +56,11 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // Dependency on a remote binary
-    implementation 'com.example.android:app-magic:12.3'
+   // implementation 'com.example.android:app-magic:12.3'
+
+    implementation ("androidx.lifecycle:lifecycle-extensions:2.2.0@aar") {
+        transitive = true
+    }
 
 
 

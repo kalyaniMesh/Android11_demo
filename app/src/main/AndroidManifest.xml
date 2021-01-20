@@ -20,11 +20,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Android11_demo">
+        <activity android:name=".PowerManagerActivity"></activity>
+        <activity android:name=".SampActivity" />
         <activity android:name=".KeyboardIMEActivity">
             <intent-filter>
-                <action android:name="android.intent.action.SEND"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeGroup="myMimeGroup"/>
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeGroup="myMimeGroup" />
             </intent-filter>
         </activity>
         <activity android:name=".AuditAccessToDataActivity" />

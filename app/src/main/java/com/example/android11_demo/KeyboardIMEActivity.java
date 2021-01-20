@@ -2,6 +2,8 @@ package com.example.android11_demo;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
 
 import android.graphics.Insets;
 import android.os.Build;
@@ -16,15 +18,16 @@ public class KeyboardIMEActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_keyboard_i_m_e);
+/*
 
 
-      /*  mRoot.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+        ViewCompat.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+            @RequiresApi(api = Build.VERSION_CODES.R)
             @Override
             public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
 
-                Insets barsIME = insets.getInsets(WindowInsets.Type.systemBars() | WindowInsets.Type.ime());
-                mRootView.setPadding(barsIme.left, barsIme.top, barsIme.right,
-                        barsIme.bottom);
+                Insets barsIme = insets.getInsets(WindowInsets.Type.systemBars() | WindowInsets.Type.ime());
+                mRootView.setPadding(barsIme.left, barsIme.top, barsIme.right, barsIme.bottom);
 
                 // We return the new WindowInsets.CONSUMED to stop the insets being
                 // dispatched any further into the view hierarchy. This replaces the
@@ -32,7 +35,8 @@ public class KeyboardIMEActivity extends AppCompatActivity {
                 // functions.
                 return WindowInsets.CONSUMED;
             }
-        });*/
+        });
+*/
 
     }
 }

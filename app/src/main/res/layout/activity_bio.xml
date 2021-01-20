@@ -80,6 +80,15 @@
         android:text="Audit Access Data"
         />
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_marginTop="20dp"
+        android:id="@+id/btnPowerManager"
+        android:onClick="onClick"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Power Manager"
+        />
+
 
 
 
