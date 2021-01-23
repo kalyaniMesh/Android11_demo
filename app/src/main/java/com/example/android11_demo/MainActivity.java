@@ -1,12 +1,14 @@
 package com.example.android11_demo;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.core.app.Person;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,6 +30,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
+import android.widget.RemoteViews;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -53,6 +56,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         mContext = this;
+
+        //Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         CharSequence name = "My Channel";
@@ -148,6 +154,8 @@ public class MainActivity extends AppCompatActivity {
                 Intent target = new Intent(MainActivity.this, BubbleActivity.class);
                 PendingIntent bubbleIntent =
                         PendingIntent.getActivity(MainActivity.this, 0, target, PendingIntent.FLAG_UPDATE_CURRENT /* flags */);
+              //  startForegroundService(target);
+                //Person user = new Person.Builder().setIcon(userIcon).setName(userName).build();
 
                 // Create bubble metadata
                 Notification.BubbleMetadata bubbleData =
@@ -155,8 +163,8 @@ public class MainActivity extends AppCompatActivity {
                                 .setDesiredHeight(600)
                                 .setIcon(Icon.createWithResource(MainActivity.this, R.mipmap.ic_launcher))
                                 .setIntent(bubbleIntent)
-                                .setAutoExpandBubble(true)
-                                .setSuppressNotification(true)
+                               // .setAutoExpandBubble(true)
+                               // .setSuppressNotification(true)
                                 .build();
 
                 // Create notification
@@ -165,18 +173,27 @@ public class MainActivity extends AppCompatActivity {
                         .setImportant(true)
                         .build();
 
+                        NotificationCompat.MessagingStyle style = new NotificationCompat.MessagingStyle(chatPartner)
+                        .addMessage("text 1",1,chatPartner)
+                                .addMessage("text 2",1,chatPartner)
+                        .setGroupConversation(isInMultiWindowMode());
+
+
                 Notification.Builder builder =
                         new Notification.Builder(MainActivity.this, mChannel.getId())
                                 .setContentIntent(bubbleIntent)
                                 .setSmallIcon(R.mipmap.ic_launcher)
                                 .setBubbleMetadata(bubbleData)
+                                .setCategory(NotificationCompat.CATEGORY_CALL)
                                 .addPerson(String.valueOf(chatPartner));
 
                 mNotificationManager.createNotificationChannel(mChannel);
                 mNotificationManager.notify(1, builder.build());
+
                 break;
 
             case R.id.btnBubble2:
+
                 target = new Intent(MainActivity.this, BubbleActivity.class);
                 target.putExtra("key","This is the second bubble");
                 bubbleIntent =

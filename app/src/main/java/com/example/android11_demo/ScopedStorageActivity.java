@@ -24,8 +24,6 @@ public class ScopedStorageActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scoped_storage);
-
-
     }
 
     private void createFile(Uri pickerInitialUri) {

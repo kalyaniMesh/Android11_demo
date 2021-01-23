@@ -25,6 +25,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -58,32 +59,30 @@ public class BioActivity extends AppCompatActivity {
          funBiometric();
         try {
             funResourcesProviderAndLoader();
-        } catch (IOException e) {
+        } catch (IOException | InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
 
     private void funDisplayCutout(){
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                getWindow().getAttributes().layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
-            }
-
-            /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            DisplayCutout displayCutout = getWindow().getDecorView().getRootWindowInsets().getDisplayCutout();
-            }*/
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+            getWindow().getAttributes().layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
-    private void funResourcesProviderAndLoader() throws IOException {
+    private void funResourcesProviderAndLoader() throws IOException, InstantiationException, IllegalAccessException {
         String sdkroot = getApplicationInfo().dataDir + "/Pictures";
         ResourcesLoader rl = new ResourcesLoader();
         rl.addProvider(ResourcesProvider.loadFromDirectory(sdkroot, null));
         Resources res = getResources();
         res.addLoaders(rl);
-        final AssetManager assetManager = res.getAssets();
-        //              AssetManager am = AssetManager.class.newInstance();
+      //  final AssetManager assetManager = res.getAssets();
+        AssetManager assetManager = AssetManager.class.newInstance();
         InputStream is1 = assetManager.open("demo2.png");
         Bitmap bitmap1 = BitmapFactory.decodeStream(is1);
         InputStream is2 = assetManager.open("demo1.png");
@@ -188,6 +187,21 @@ public class BioActivity extends AppCompatActivity {
                 startActivity(new Intent(BioActivity.this, PowerManagerActivity.class));
                 break;
 
+            case R.id.btnShowToast:
+                startActivity(new Intent(BioActivity.this, ToastActivity.class));
+                break;
+
+            case R.id.btnSnackbar:
+                startActivity(new Intent(BioActivity.this, SnackbarWithCoordinateActivity.class));
+                break;
+
+            case R.id.btnKeyboardIME:
+                startActivity(new Intent(BioActivity.this, KeyboardIMEActivity.class));
+                break;
+
+            case R.id.btnPackageVis:
+                startActivity(new Intent(BioActivity.this, PackageVisibilityActivity.class));
+                break;
         }
     }
 }

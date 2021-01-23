@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".KeyboardIMEActivity">
+    tools:context=".ToastActivity">
 
-    <androidx.appcompat.widget.AppCompatEditText
+    <androidx.appcompat.widget.AppCompatButton
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="enter"
-        android:id="@+id/edtText"/>
+        android:id="@+id/btnToast"
+        android:text="Show Toast"/>
 
 </androidx.appcompat.widget.LinearLayoutCompat>

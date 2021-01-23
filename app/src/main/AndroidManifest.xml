@@ -13,6 +13,10 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
+    <queries>
+        <package android:name="com.example.android11_demo" />
+    </queries>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -20,8 +24,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Android11_demo">
-        <activity android:name=".PowerManagerActivity"></activity>
-        <activity android:name=".SampActivity" />
+        <activity android:name=".PackageVisibilityActivity"></activity>
+        <activity android:name=".SnackbarWithCoordinateActivity" />
+        <activity android:name=".ToastActivity" />
+        <activity android:name=".PowerManagerActivity" />
+
         <activity android:name=".KeyboardIMEActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />

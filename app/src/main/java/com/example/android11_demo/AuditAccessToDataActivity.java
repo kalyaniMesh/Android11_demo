@@ -16,9 +16,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.PersistableBundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -31,6 +33,7 @@ public class AuditAccessToDataActivity extends AppCompatActivity {
     private static final String TAG = AuditAccessToDataActivity.class.getName();
     GPSTracker mGpsTracker;
     double latitude,longitude;
+    private Context attributionContext;
 
     @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
@@ -38,12 +41,16 @@ public class AuditAccessToDataActivity extends AppCompatActivity {
                          @Nullable PersistableBundle persistentState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_audit_access_to_data);
-        mContext = this;
-        checkRunTimePermission();
 
+        //Create attribution（attribute）
+        attributionContext = createAttributionContext("visitLocation");
+
+        mContext = this;
+
+        //Listen for events
         AppOpsManager.OnOpNotedCallback appOpsCallback =
                 new AppOpsManager.OnOpNotedCallback() {
-                    private void logPrivateDataAccess(String opCode, String trace) {
+                    private void logPrivateDataAccess(String opCode,String attributionTag,String trace) {
 /*
                         mGpsTracker = new GPSTracker(mContext);
                         if (mGpsTracker.canGetLocation()) {
@@ -51,7 +58,9 @@ public class AuditAccessToDataActivity extends AppCompatActivity {
                             longitude = mGpsTracker.getLongitude();
                         }
 */
-                        Log.i(TAG, "Private data accessed. " + "Operation:"+ opCode+ "\n" + trace);
+                        Log.d(TAG, "zwm, logPrivateDataAccess, opCode: " + opCode);
+                        Log.d(TAG, "zwm, logPrivateDataAccess, attributionTag: " + attributionTag);
+                        Log.d(TAG, "zwm, logPrivateDataAccess, trace: " + trace);
                     }
 
                     @Override
@@ -59,7 +68,7 @@ public class AuditAccessToDataActivity extends AppCompatActivity {
                         /*onNoted - Called when protected data is accessed via a synchronous call. For example, onNoted
                          * would be triggered if an app requested the user's last known location and that function returns
                          * the value synchronously (right away).*/
-                        logPrivateDataAccess(syncNotedAppOp.getOp(),
+                        logPrivateDataAccess(syncNotedAppOp.getOp(),syncNotedAppOp.getAttributionTag(),
                                 Arrays.toString(new Throwable().getStackTrace()));
                     }
 
@@ -70,7 +79,7 @@ public class AuditAccessToDataActivity extends AppCompatActivity {
                          * it's own {@link android.os.Processl#myUid}. This is the only callback that isn't triggered by
                          * the system. It's a way for apps to to blame themselves when they feel like they are accessing
                          * protected data and want to audit it.*/
-                        logPrivateDataAccess(syncNotedAppOp.getOp(),
+                        logPrivateDataAccess(syncNotedAppOp.getOp(),syncNotedAppOp.getAttributionTag(),
                                 Arrays.toString(new Throwable().getStackTrace()));
                     }
 
@@ -79,85 +88,32 @@ public class AuditAccessToDataActivity extends AppCompatActivity {
                         /*>onAsyncNoted - Called when protected data is accessed via an asynchronous callback. For
                          * example, if an app subscribed to location changes, onAsyncNoted would be triggered when the
                          * callback is invoked and returns a new location. A Geofence is another example.*/
-                        logPrivateDataAccess(asyncNotedAppOp.getOp(),
+                        logPrivateDataAccess(asyncNotedAppOp.getOp(),asyncNotedAppOp.getAttributionTag(),
                                 asyncNotedAppOp.getMessage());
                     }
                 };
 
+        //Turn on private data monitoring
         AppOpsManager appOpsManager = getSystemService(AppOpsManager.class);
         if (appOpsManager != null) {
             appOpsManager.setOnOpNotedCallback(getMainExecutor(), appOpsCallback);
         }
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                getLocation();
+            }
+        }, 5000);
     }
 
-    public void checkRunTimePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                    ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED||
-                    ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                mGpsTracker = new GPSTracker(mContext);
-
-            } else {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
-                        10);
-            }
-        } else {
-            mGpsTracker = new GPSTracker(mContext); //GPSTracker is class that is used for retrieve user current location
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void getLocation() {
+        LocationManager locationManager = (LocationManager) attributionContext.getSystemService(LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Log.d(TAG, "zwm, getLocation");
+            locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         }
     }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 10) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                mGpsTracker = new GPSTracker(mContext);
-            } else {
-                if (!ActivityCompat.shouldShowRequestPermissionRationale((Activity) mContext, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    // If User Checked 'Don't Show Again' checkbox for runtime permission, then navigate user to Settings
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
-                    dialog.setTitle("Permission Required");
-                    dialog.setCancelable(false);
-                    dialog.setMessage("You have to Allow permission to access user location");
-                    dialog.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
-                        @RequiresApi(api = Build.VERSION_CODES.Q)
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent i = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package",
-                                    mContext.getPackageName(), null));
-                            //i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivityForResult(i, 1001);
-                        }
-                    });
-                    AlertDialog alertDialog = dialog.create();
-                    alertDialog.show();
-                }
-                //code for deny
-            }
-        }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.Q)
-    @Override
-    public void startActivityForResult(Intent intent, int requestCode) {
-        super.startActivityForResult(intent, requestCode);
-        if (requestCode == 1001) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                        ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                        || ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    mGpsTracker = new GPSTracker(mContext);
-                    if (mGpsTracker.canGetLocation()) {
-                        // latitude = gpsTracker.getLatitude();
-                        //longitude = gpsTracker.getLongitude();
-                    }
-                } else {
-                    requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 10);
-                }
-            }
-        }
-    }
-
-
 }
